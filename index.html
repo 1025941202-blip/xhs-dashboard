@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小红书养生赛道选题看板</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --red: #FF2442;
+      --red-light: #FFF0F2;
+      --orange: #FF8C00;
+      --purple: #9B59B6;
+      --bg: #F5F5F7;
+      --card-bg: #FFFFFF;
+      --text-primary: #1A1A1A;
+      --text-secondary: #555;
+      --text-muted: #999;
+      --border: #EBEBEB;
+      --shadow: 0 2px 12px rgba(0,0,0,.07);
+      --shadow-hover: 0 8px 28px rgba(0,0,0,.13);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    /* ───── 顶部栏 ───── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--red);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 16px;
+    }
+    .logo-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .logo-tag {
+      background: var(--red-light);
+      color: var(--red);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .topbar-meta {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #52C41A; margin-right: 5px; vertical-align: middle; }
+
+    /* ───── 工具栏 ───── */
+    .toolbar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .search-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .search-wrap svg {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+    .search-input {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 7px 14px 7px 34px;
+      font-size: 13px;
+      width: 220px;
+      outline: none;
+      transition: border-color .2s;
+      background: var(--bg);
+    }
+    .search-input:focus { border-color: var(--red); }
+    .sort-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+      flex-wrap: wrap;
+    }
+    .sort-label { font-size: 13px; color: var(--text-muted); }
+    .sort-btn {
+      padding: 6px 13px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: transparent;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-secondary);
+      transition: all .18s;
+      white-space: nowrap;
+    }
+    .sort-btn:hover { border-color: var(--red); color: var(--red); }
+    .sort-btn.active { background: var(--red); color: #fff; border-color: var(--red); }
+    .sort-btn.active-date { background: #1A1A1A; color: #fff; border-color: #1A1A1A; }
+
+    /* ───── 统计概览 ───── */
+    .stats-row {
+      padding: 16px 24px 0;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .stat-chip {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 12px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border: 1px solid var(--border);
+      min-width: 120px;
+    }
+    .stat-chip .s-label { font-size: 11px; color: var(--text-muted); }
+    .stat-chip .s-val { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+
+    /* ───── 卡片网格 ───── */
+    .grid {
+      padding: 16px 24px 32px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: transform .2s, box-shadow .2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+
+    /* 封面 */
+    .card-cover {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: linear-gradient(135deg, #fce4ec, #f3e5f5);
+      display: block;
+    }
+    .card-cover-ph {
+      width: 100%;
+      height: 180px;
+      background: linear-gradient(135deg, #FFF0F2, #f3e5f5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+    }
+
+    /* 正文 */
+    .card-body { padding: 14px 14px 12px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .card-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .card-tag {
+      background: var(--red-light);
+      color: var(--red);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 8px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* 数据指标 */
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+    .metric {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 7px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .metric .m-icon { font-size: 14px; }
+    .metric .m-val { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .metric .m-lbl { font-size: 10px; color: var(--text-muted); }
+    .metric.m-likes .m-val { color: var(--red); }
+    .metric.m-saves .m-val { color: var(--orange); }
+    .metric.m-comments .m-val { color: var(--purple); }
+
+    .metrics-row2 {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .metrics-row2 span { display: flex; align-items: center; gap: 3px; }
+
+    .pub-date { font-size: 11px; color: var(--text-muted); }
+
+    /* 分隔线 */
+    .card-divider { border: none; border-top: 1px solid var(--border); margin: 2px 0; }
+
+    /* 博主信息 */
+    .blogger {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 2px;
+    }
+    .blogger-ava {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .blogger-ava-ph {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--red), #FF6B6B);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .blogger-info { flex: 1; min-width: 0; }
+    .blogger-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .blogger-fans { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .blogger-bio {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 空状态 */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state .e-icon { font-size: 52px; margin-bottom: 16px; }
+    .empty-state p { font-size: 15px; }
+    .empty-state small { font-size: 12px; display: block; margin-top: 6px; }
+
+    /* 排行徽章 */
+    .rank-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: white;
+    }
+    .rank-1 { background: #FFD700; color: #333; }
+    .rank-2 { background: #C0C0C0; color: #333; }
+    .rank-3 { background: #CD7F32; }
+    .rank-other { background: rgba(0,0,0,.35); }
+    .cover-wrap { position: relative; }
+
+    @media (max-width: 640px) {
+      .topbar { padding: 0 14px; }
+      .toolbar { padding: 8px 14px; }
+      .sort-group { margin-left: 0; }
+      .grid { padding: 12px 14px 24px; grid-template-columns: 1fr; }
+      .stats-row { padding: 12px 14px 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 顶部栏 -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">🌿</div>
+    <span class="logo-text">养生赛道选题看板</span>
+    <span class="logo-tag">小红书</span>
+  </div>
+  <span class="topbar-meta">
+    <span class="dot"></span>共 <b id="total-count">0</b> 条笔记&nbsp;&nbsp;更新于 <span id="update-time">—</span>
+  </span>
+</div>
+
+<!-- 工具栏 -->
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input class="search-input" id="search-input" type="text" placeholder="搜索笔记标题或博主…" oninput="renderCards()">
+  </div>
+  <div class="sort-group">
+    <span class="sort-label">排序：</span>
+    <button class="sort-btn active" data-sort="likes" onclick="setSort(this)">❤️ 点赞</button>
+    <button class="sort-btn" data-sort="saves" onclick="setSort(this)">⭐ 收藏</button>
+    <button class="sort-btn" data-sort="comments" onclick="setSort(this)">💬 评论</button>
+    <button class="sort-btn" data-sort="reads" onclick="setSort(this)">👁 阅读</button>
+    <button class="sort-btn" data-sort="shares" onclick="setSort(this)">🔗 分享</button>
+    <button class="sort-btn" data-sort="date" onclick="setSort(this)">📅 时间</button>
+  </div>
+  <div class="sort-group" style="margin-left:0; border-left: 1px solid var(--border); padding-left: 10px;">
+    <span class="sort-label">时间：</span>
+    <button class="sort-btn" data-days="0" onclick="setDateFilter(this)">全部</button>
+    <button class="sort-btn active-date" data-days="180" onclick="setDateFilter(this)">近6个月</button>
+    <button class="sort-btn" data-days="90" onclick="setDateFilter(this)">近3个月</button>
+    <button class="sort-btn" data-days="30" onclick="setDateFilter(this)">近1个月</button>
+  </div>
+</div>
+
+<!-- 统计概览 -->
+<div class="stats-row" id="stats-row"></div>
+
+<!-- 卡片网格 -->
+<div class="grid" id="card-grid"></div>
+
+<script>
+  let allData = [];
+  let currentSort = 'likes';
+  let currentDays = 180; // 默认近6个月
+
+  // ── 数字格式化
+  function fmt(n) {
+    if (n == null || n === '') return '—';
+    n = Number(n);
+    if (isNaN(n)) return '—';
+    if (n >= 100000000) return (n / 100000000).toFixed(1) + '亿';
+    if (n >= 10000) return (n / 10000).toFixed(1) + '万';
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+    return n.toLocaleString('zh-CN');
+  }
+
+  // ── 切换排序
+  function setSort(btn) {
+    currentSort = btn.dataset.sort;
+    document.querySelectorAll('.sort-btn:not([data-days])').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderCards();
+  }
+
+  // ── 切换时间筛选
+  function setDateFilter(btn) {
+    currentDays = Number(btn.dataset.days);
+    document.querySelectorAll('.sort-btn[data-days]').forEach(b => b.classList.remove('active-date'));
+    btn.classList.add('active-date');
+    renderCards();
+  }
+
+  // ── 渲染统计条
+  function renderStats(data) {
+    const sum = (key) => data.reduce((s, d) => s + (Number(d[key]) || 0), 0);
+    const avg = (key) => data.length ? Math.round(sum(key) / data.length) : 0;
+    document.getElementById('stats-row').innerHTML = [
+      ['笔记数量', data.length],
+      ['总点赞数', fmt(sum('likes'))],
+      ['总收藏数', fmt(sum('saves'))],
+      ['总评论数', fmt(sum('comments'))],
+      ['平均点赞', fmt(avg('likes'))],
+      ['平均收藏', fmt(avg('saves'))],
+    ].map(([l, v]) => `
+      <div class="stat-chip">
+        <div class="s-label">${l}</div>
+        <div class="s-val">${v}</div>
+      </div>`).join('');
+  }
+
+  // ── 渲染卡片
+  function renderCards() {
+    const q = document.getElementById('search-input').value.trim().toLowerCase();
+    const cutoff = currentDays > 0
+      ? new Date(Date.now() - currentDays * 864e5)
+      : null;
+
+    let data = allData.filter(d => {
+      if (q && !(d.title || '').toLowerCase().includes(q) && !(d.blogger_name || '').toLowerCase().includes(q)) return false;
+      if (cutoff && d.publish_date) {
+        const pub = new Date(d.publish_date);
+        if (!isNaN(pub) && pub < cutoff) return false;
+      }
+      return true;
+    });
+
+    data.sort((a, b) => {
+      if (currentSort === 'date') return new Date(b.publish_date || 0) - new Date(a.publish_date || 0);
+      return (Number(b[currentSort]) || 0) - (Number(a[currentSort]) || 0);
+    });
+
+    const grid = document.getElementById('card-grid');
+    if (!data.length) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="e-icon">🌿</div>
+          <p>${q ? '没有找到匹配的笔记' : '暂无数据'}</p>
+          <small>${q ? '换个关键词试试' : '请先运行爬虫脚本，或检查 data.json 是否存在'}</small>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = data.map((d, i) => {
+      const rank = i + 1;
+      const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-other';
+      const rankLabel = rank <= 3 ? ['🥇','🥈','🥉'][rank - 1] : rank;
+
+      const coverHtml = d.cover_image
+        ? `<img class="card-cover" src="${esc(d.cover_image)}" alt="封面" loading="lazy"
+             onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'card-cover-ph',textContent:'🌿'}))">`
+        : `<div class="card-cover-ph">🌿</div>`;
+
+      const avaHtml = d.blogger_avatar
+        ? `<img class="blogger-ava" src="${esc(d.blogger_avatar)}" alt="${esc(d.blogger_name)}"
+             onerror="this.replaceWith(makePh('${(d.blogger_name||'?')[0]}'))">`
+        : `<div class="blogger-ava-ph">${(d.blogger_name || '?')[0]}</div>`;
+
+      const tags = (d.tags || '').split(',').map(t => t.trim()).filter(Boolean)
+        .map(t => `<span class="card-tag">${esc(t)}</span>`).join('');
+
+      return `
+        <div class="card">
+          <div class="cover-wrap">
+            ${coverHtml}
+            <div class="rank-badge ${rankClass}">${rankLabel}</div>
+          </div>
+          <div class="card-body">
+            ${tags ? `<div class="card-tags">${tags}</div>` : ''}
+            <div class="card-title">${esc(d.title || '无标题')}</div>
+
+            <div class="metrics">
+              <div class="metric m-likes">
+                <span class="m-icon">❤️</span>
+                <span class="m-val">${fmt(d.likes)}</span>
+                <span class="m-lbl">点赞</span>
+              </div>
+              <div class="metric m-saves">
+                <span class="m-icon">⭐</span>
+                <span class="m-val">${fmt(d.saves)}</span>
+                <span class="m-lbl">收藏</span>
+              </div>
+              <div class="metric m-comments">
+                <span class="m-icon">💬</span>
+                <span class="m-val">${fmt(d.comments)}</span>
+                <span class="m-lbl">评论</span>
+              </div>
+            </div>
+
+            <div class="metrics-row2">
+              <span>👁 阅读&nbsp;<b>${fmt(d.reads)}</b></span>
+              <span>🔗 分享&nbsp;<b>${fmt(d.shares)}</b></span>
+              <span class="pub-date" style="margin-left:auto">📅 ${d.publish_date || '—'}</span>
+            </div>
+
+            <hr class="card-divider">
+
+            <div class="blogger">
+              ${avaHtml}
+              <div class="blogger-info">
+                <div class="blogger-name">${esc(d.blogger_name || '未知博主')}</div>
+                <div class="blogger-fans">粉丝 ${fmt(d.followers)}</div>
+                <div class="blogger-bio" title="${esc(d.blogger_bio || '')}">${esc(d.blogger_bio || '')}</div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function makePh(ch) {
+    const d = document.createElement('div');
+    d.className = 'blogger-ava-ph';
+    d.textContent = ch;
+    return d;
+  }
+
+  // ── 加载数据
+  async function loadData() {
+    try {
+      const r = await fetch('data.json');
+      if (!r.ok) throw new Error('not found');
+      const json = await r.json();
+      allData = json.notes || [];
+      document.getElementById('total-count').textContent = allData.length;
+      document.getElementById('update-time').textContent = json.updated_at || '—';
+    } catch {
+      allData = sampleData();
+      document.getElementById('total-count').textContent = allData.length;
+      document.getElementById('update-time').textContent = '示例数据';
+    }
+    renderStats(allData);
+    renderCards();
+  }
+
+  function sampleData() {
+    return [
+      { title:"减脂不节食！每天这样吃，一个月瘦了8斤还没反弹", cover_image:"https://picsum.photos/seed/diet10/400/300", reads:498000, likes:112000, saves:138000, comments:9800, shares:7200, publish_date:"2026-02-26", tags:"减脂,饮食", blogger_name:"瘦身营养师", blogger_avatar:"https://picsum.photos/seed/av10/80/80", blogger_bio:"注册营养师｜科学减脂不反弹", followers:538000 },
+      { title:"熬夜必看！这5个补救措施，最大程度减少熬夜伤害", cover_image:"https://picsum.photos/seed/night25/400/300", reads:467000, likes:103000, saves:128000, comments:8600, shares:6400, publish_date:"2026-02-27", tags:"熬夜,补救", blogger_name:"健康急救包", blogger_avatar:"https://picsum.photos/seed/av25/80/80", blogger_bio:"医学生｜实用健康知识分享", followers:389000 },
+      { title:"中医说：这4种体质最容易胖！找准体质才能真正瘦下来", cover_image:"https://picsum.photos/seed/body29/400/300", reads:445000, likes:99200, saves:121000, comments:8300, shares:6100, publish_date:"2026-02-03", tags:"体质,减肥", blogger_name:"体质养生研究所", blogger_avatar:"https://picsum.photos/seed/av29/80/80", blogger_bio:"中医体质辨识专家｜个性化养生", followers:567000 },
+      { title:"月经不调的根本原因！中医妇科医生解答，附调理方案", cover_image:"https://picsum.photos/seed/women14/400/300", reads:423000, likes:94500, saves:118000, comments:8900, shares:6700, publish_date:"2026-02-19", tags:"月经,女性健康", blogger_name:"妇科养生堂", blogger_avatar:"https://picsum.photos/seed/av14/80/80", blogger_bio:"执业妇科医生｜女性健康科普", followers:612000 },
+      { title:"掉发严重？先看看你缺什么！中医视角分析4种掉发类型", cover_image:"https://picsum.photos/seed/hair17/400/300", reads:412000, likes:91300, saves:108000, comments:7800, shares:5900, publish_date:"2026-01-28", tags:"掉发,头发养护", blogger_name:"养发护发研究所", blogger_avatar:"https://picsum.photos/seed/av17/80/80", blogger_bio:"专注头发健康5年｜天然养发秘方", followers:445000 },
+      { title:"喝红枣枸杞水没用！补气血要这样喝，中医配方才对", cover_image:"https://picsum.photos/seed/blood24/400/300", reads:389000, likes:87100, saves:105000, comments:7200, shares:5500, publish_date:"2026-02-20", tags:"气血,补血", blogger_name:"气血调理坊", blogger_avatar:"https://picsum.photos/seed/av24/80/80", blogger_bio:"中医世家第三代｜专注气血调理", followers:498000 },
+      { title:"冬春换季补肾就这5步！男女通用，肾好气色好全身暖", cover_image:"https://picsum.photos/seed/kidney2/400/300", reads:389000, likes:76200, saves:89300, comments:5600, shares:4100, publish_date:"2026-02-10", tags:"补肾,冬季养生", blogger_name:"中医健康说", blogger_avatar:"https://picsum.photos/seed/av2/80/80", blogger_bio:"执业中医师，专注分享靠谱养生知识", followers:312000 },
+      { title:"湿气重的人，身体会发出这6个信号！对照自查一下", cover_image:"https://picsum.photos/seed/humid9/400/300", reads:312000, likes:69800, saves:85200, comments:5100, shares:3900, publish_date:"2026-02-14", tags:"湿气,自查", blogger_name:"中医养生圈", blogger_avatar:"https://picsum.photos/seed/av9/80/80", blogger_bio:"传播正确养生观念，远离伪科学", followers:421000 },
+      { title:"皮肤暗黄长斑？不是缺水，是这3个内脏出了问题", cover_image:"https://picsum.photos/seed/skin12/400/300", reads:356000, likes:78600, saves:96500, comments:6800, shares:5100, publish_date:"2026-02-08", tags:"皮肤,暗黄", blogger_name:"美肤养生派", blogger_avatar:"https://picsum.photos/seed/av12/80/80", blogger_bio:"皮肤科护士｜内调外养真实分享", followers:376000 },
+      { title:"便秘4年，试了这个方法1周通畅了！中医调脾胃真管用", cover_image:"https://picsum.photos/seed/gut21/400/300", reads:345000, likes:76900, saves:93600, comments:6100, shares:4800, publish_date:"2026-01-05", tags:"便秘,脾胃", blogger_name:"肠道健康说", blogger_avatar:"https://picsum.photos/seed/av21/80/80", blogger_bio:"消化科医生｜肠道健康科普", followers:334000 },
+      { title:"颈椎疼！每天这3个动作，疼痛减轻80%，不用去医院", cover_image:"https://picsum.photos/seed/neck15/400/300", reads:338000, likes:74100, saves:91600, comments:5400, shares:4100, publish_date:"2026-01-12", tags:"颈椎,运动康复", blogger_name:"脊柱康复师", blogger_avatar:"https://picsum.photos/seed/av15/80/80", blogger_bio:"康复治疗师｜颈腰椎专项调理", followers:267000 },
+      { title:"焦虑睡不着，试试这个：4-7-8呼吸法，5分钟入睡", cover_image:"https://picsum.photos/seed/anxiety27/400/300", reads:321000, likes:71800, saves:89400, comments:5900, shares:4600, publish_date:"2026-01-18", tags:"焦虑,睡眠", blogger_name:"睡眠优化师", blogger_avatar:"https://picsum.photos/seed/av27/80/80", blogger_bio:"睡眠质量改善研究者", followers:256000 },
+      { title:"艾灸这4个穴位，排寒湿比泡脚还管用！附详细操作教程", cover_image:"https://picsum.photos/seed/moxa3/400/300", reads:298000, likes:62100, saves:78500, comments:4200, shares:3300, publish_date:"2026-01-25", tags:"艾灸,祛湿寒", blogger_name:"艾灸养生课", blogger_avatar:"https://picsum.photos/seed/av3/80/80", blogger_bio:"传播艾灸文化，远离亚健康", followers:182000 },
+      { title:"每天睡前泡脚加这3样，驱寒祛湿效果翻倍！配方全公开", cover_image:"https://picsum.photos/seed/foot4/400/300", reads:276000, likes:58900, saves:71200, comments:3800, shares:2900, publish_date:"2026-02-05", tags:"泡脚,祛湿", blogger_name:"健康生活家", blogger_avatar:"https://picsum.photos/seed/av4/80/80", blogger_bio:"分享简单易行的居家养生方法", followers:89000 },
+      { title:"情绪内耗太严重？中医说这是心脾两虚，这样调理一个月", cover_image:"https://picsum.photos/seed/emotion11/400/300", reads:267000, likes:59400, saves:72800, comments:6200, shares:4500, publish_date:"2026-01-30", tags:"情绪,心脾", blogger_name:"情绪疗愈课", blogger_avatar:"https://picsum.photos/seed/av11/80/80", blogger_bio:"心理咨询师｜中医情志调理", followers:289000 },
+      { title:"每天早起做这5件事，坚持1个月精气神完全不同！", cover_image:"https://picsum.photos/seed/morning13/400/300", reads:289000, likes:63200, saves:79100, comments:4300, shares:3200, publish_date:"2026-01-20", tags:"早起,生活习惯", blogger_name:"早起打卡团", blogger_avatar:"https://picsum.photos/seed/av13/80/80", blogger_bio:"坚持早起3年｜自律生活方式分享", followers:198000 },
+      { title:"长期失眠的根本原因！中医3步彻底改善，亲测有效", cover_image:"https://picsum.photos/seed/sleep1/400/300", reads:521000, likes:98400, saves:112000, comments:8900, shares:6200, publish_date:"2026-02-18", tags:"失眠,睡眠养生", blogger_name:"睡眠调理师小林", blogger_avatar:"https://picsum.photos/seed/av1/80/80", blogger_bio:"专注睡眠健康5年｜中医调理失眠", followers:268000 },
+      { title:"坚持喝这4种养生茶3个月，我的气色变化让闺蜜都惊了", cover_image:"https://picsum.photos/seed/tea5/400/300", reads:245000, likes:52300, saves:63800, comments:3500, shares:2600, publish_date:"2026-01-15", tags:"养生茶,气色", blogger_name:"养生小达人", blogger_avatar:"https://picsum.photos/seed/av5/80/80", blogger_bio:"中医科普｜健康生活方式分享", followers:125000 },
+      { title:"枸杞怎么吃效果最好？这3种吃法才对，99%人都吃错了", cover_image:"https://picsum.photos/seed/goji22/400/300", reads:278000, likes:61400, saves:76200, comments:3900, shares:2900, publish_date:"2026-02-16", tags:"枸杞,食疗", blogger_name:"本草养生录", blogger_avatar:"https://picsum.photos/seed/av22/80/80", blogger_bio:"中医药大学在读｜本草食疗科普", followers:201000 },
+      { title:"每天5分钟腹式呼吸，坚持21天，焦虑失眠全改善！", cover_image:"https://picsum.photos/seed/breath20/400/300", reads:231000, likes:51800, saves:64300, comments:4600, shares:3500, publish_date:"2026-02-01", tags:"呼吸,减压", blogger_name:"正念冥想社", blogger_avatar:"https://picsum.photos/seed/av20/80/80", blogger_bio:"正念冥想导师｜情绪管理分享", followers:178000 },
+      { title:"血糖高怎么吃？营养师给出一周控糖食谱，简单好操作", cover_image:"https://picsum.photos/seed/sugar18/400/300", reads:256000, likes:56200, saves:71900, comments:4200, shares:3100, publish_date:"2026-02-12", tags:"血糖,控糖饮食", blogger_name:"控糖生活家", blogger_avatar:"https://picsum.photos/seed/av18/80/80", blogger_bio:"注册营养师｜糖尿病饮食管理", followers:223000 },
+      { title:"脾胃差的人每天早上吃这一碗，坚持一个月肠胃明显改善", cover_image:"https://picsum.photos/seed/stomach6/400/300", reads:198000, likes:43600, saves:56100, comments:2900, shares:2100, publish_date:"2026-02-22", tags:"脾胃调理,食疗", blogger_name:"营养小厨娘", blogger_avatar:"https://picsum.photos/seed/av6/80/80", blogger_bio:"营养师执照｜食疗养生｜健康厨房", followers:67000 },
+      { title:"春季养肝喝什么？中医推荐5款花草茶，护肝排毒一举两得", cover_image:"https://picsum.photos/seed/spring16/400/300", reads:201000, likes:44800, saves:56200, comments:3100, shares:2300, publish_date:"2026-02-25", tags:"春季养肝,花草茶", blogger_name:"节气养生录", blogger_avatar:"https://picsum.photos/seed/av16/80/80", blogger_bio:"按节气养生，顺应自然才健康", followers:154000 },
+      { title:"入冬后多吃这3种黑色食物，补肾又暖身！附每日食谱", cover_image:"https://picsum.photos/seed/black8/400/300", reads:174000, likes:38900, saves:48700, comments:2400, shares:1760, publish_date:"2025-12-20", tags:"黑色食物,补肾", blogger_name:"中医食疗坊", blogger_avatar:"https://picsum.photos/seed/av8/80/80", blogger_bio:"传统食疗文化传播者", followers:143000 },
+      { title:"肩颈酸痛上班族必看！10分钟办公室拉伸操，缓解立竿见影", cover_image:"https://picsum.photos/seed/stretch28/400/300", reads:289000, likes:64200, saves:82100, comments:4700, shares:3600, publish_date:"2025-10-15", tags:"肩颈,拉伸", blogger_name:"打工人健康手册", blogger_avatar:"https://picsum.photos/seed/av28/80/80", blogger_bio:"运动康复师｜打工人专属养生法", followers:312000 },
+      { title:"手脚冰凉是阳虚？中医一招判断，附补阳暖身食疗方", cover_image:"https://picsum.photos/seed/cold19/400/300", reads:187000, likes:41600, saves:53200, comments:2800, shares:2100, publish_date:"2025-12-15", tags:"手脚冰凉,阳虚", blogger_name:"暖身养生馆", blogger_avatar:"https://picsum.photos/seed/av19/80/80", blogger_bio:"阳虚体质调理专家｜暖身食疗", followers:112000 },
+      { title:"眼睛干涩视力下降？养肝护眼这样做，不用滴眼药水", cover_image:"https://picsum.photos/seed/eye23/400/300", reads:213000, likes:47200, saves:59800, comments:3200, shares:2400, publish_date:"2025-11-28", tags:"护眼,养肝", blogger_name:"护眼养生派", blogger_avatar:"https://picsum.photos/seed/av23/80/80", blogger_bio:"眼科护士｜护眼养生分享", followers:139000 },
+      { title:"这5个护肝动作，睡前做10分钟，肝好气色棒精神足", cover_image:"https://picsum.photos/seed/liver7/400/300", reads:187000, likes:41200, saves:52600, comments:2700, shares:1980, publish_date:"2026-01-08", tags:"护肝,睡前养生", blogger_name:"健康达人Joy", blogger_avatar:"https://picsum.photos/seed/av7/80/80", blogger_bio:"健康科普博主｜分享实用养生干货", followers:195000 },
+      { title:"春天养脾胃，少生病！3种时令食材这样搭配，脾胃暖暖的", cover_image:"https://picsum.photos/seed/spleen26/400/300", reads:168000, likes:37200, saves:46800, comments:2500, shares:1900, publish_date:"2026-02-23", tags:"春季,脾胃", blogger_name:"节气厨房", blogger_avatar:"https://picsum.photos/seed/av26/80/80", blogger_bio:"按节气吃饭，吃出好体质", followers:98000 },
+      { title:"排毒不用吃药！每天喝对这杯水，毒素自然排出去", cover_image:"https://picsum.photos/seed/detox30/400/300", reads:198000, likes:43800, saves:55300, comments:3100, shares:2300, publish_date:"2025-09-20", tags:"排毒,饮水", blogger_name:"轻养生研究室", blogger_avatar:"https://picsum.photos/seed/av30/80/80", blogger_bio:"轻松养生，不折腾｜实测分享", followers:145000 },
+    ];
+  }
+
+  loadData();
+</script>
+</body>
+</html>
